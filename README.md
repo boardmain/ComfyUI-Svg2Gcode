@@ -4,6 +4,10 @@
 
 This custom node suite for ComfyUI uses `vpype` to process SVG files and generate G-code for plotting. It provides two main nodes: one for processing SVGs (merging, simplifying, rotating, layout) and another for generating G-code with customizable plotting parameters.
 
+![Example Workflow](screen.jpg)
+
+_Note: The example workflow above uses [z-image](https://github.com/Z-Image/ComfyUI-Z-Image) (or similar image loader) and [ComfyUI-ToSVG-Potracer](https://github.com/ImagineerNL/ComfyUI-ToSVG-Potracer) to generate the initial SVG from an image._
+
 ## Features
 
 - **VPype SVG Processor**:

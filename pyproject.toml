@@ -1,9 +1,9 @@
 [project]
 name = "comfyui-svg2gcode"
 description = "ComfyUI nodes for processing SVG and generating G-code using vpype"
-version = "1.0.1"
+version = "1.0.2"
 authors = [
-    { name = "Samuele Coppedè" }
+    { name = "Samuele Coppedè" , email = "boardmain@gmail.com" }
 ]
 license = { text = "MIT" }
 dependencies = ["vpype", "vpype-occult", "vpype-gcode"]
