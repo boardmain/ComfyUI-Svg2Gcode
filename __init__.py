@@ -1,5 +1,9 @@
 from .nodes import VPypeProcessor, VPypeGCodeGenerator
 
+__version__ = "1.0.0"
+__author__ = "Samuele"
+__description__ = "ComfyUI nodes for processing SVG and generating G-code using vpype"
+
 NODE_CLASS_MAPPINGS = {
     "VPypeProcessor": VPypeProcessor,
     "VPypeGCodeGenerator": VPypeGCodeGenerator
