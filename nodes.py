@@ -11,6 +11,8 @@ class VPypeProcessor:
                 "svg_input": ("STRING", {"multiline": True, "forceInput": True, "dynamicPrompts": False}),
                 "merge_tolerance": ("FLOAT", {"default": 0.1, "min": 0.0, "max": 10.0, "step": 0.01, "display": "number"}),
                 "simplify_tolerance": ("FLOAT", {"default": 0.05, "min": 0.0, "max": 10.0, "step": 0.01, "display": "number"}),
+                "min_length": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 100.0, "step": 0.1, "display": "number"}),
+                "multipass_count": ("INT", {"default": 0, "min": 0, "max": 50, "step": 1, "display": "number"}),
                 "rotation": ("FLOAT", {"default": 90.0, "min": -360.0, "max": 360.0, "step": 1.0, "display": "number"}),
                 "perform_layout": ("BOOLEAN", {"default": True}),
                 "margin": ("FLOAT", {"default": 10.0, "min": 0.0, "max": 100.0, "step": 0.1, "display": "number"}),
@@ -24,7 +26,7 @@ class VPypeProcessor:
     FUNCTION = "process_svg"
     CATEGORY = "VPype"
 
-    def process_svg(self, svg_input, merge_tolerance, simplify_tolerance, rotation, perform_layout, margin, width, height):
+    def process_svg(self, svg_input, merge_tolerance, simplify_tolerance, min_length, multipass_count, rotation, perform_layout, margin, width, height):
         # Create a temporary directory to work in
         with tempfile.TemporaryDirectory() as temp_dir:
             input_path = os.path.join(temp_dir, "input.svg")
@@ -45,9 +47,17 @@ class VPypeProcessor:
                 "read", input_path,
                 "linemerge", "--tolerance", f"{merge_tolerance}mm",
                 "linesimplify", "--tolerance", f"{simplify_tolerance}mm",
-                "linesort",
-                "rotate", str(rotation),
             ]
+
+            if min_length > 0:
+                cmd.extend(["filter", "--min-length", f"{min_length}mm"])
+
+            cmd.append("linesort")
+
+            if multipass_count > 0:
+                cmd.extend(["multipass", "--count", str(multipass_count)])
+
+            cmd.extend(["rotate", str(rotation)])
             
             if perform_layout:
                 cmd.extend([
