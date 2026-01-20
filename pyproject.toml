@@ -1,7 +1,7 @@
 [project]
 name = "comfyui-svg2gcode"
 description = "ComfyUI nodes for processing SVG and generating G-code using vpype"
-version = "1.0.0"
+version = "1.0.1"
 authors = [
     { name = "Samuele Coppedè" }
 ]
