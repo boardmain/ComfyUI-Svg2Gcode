@@ -2,6 +2,7 @@ import os
 import subprocess
 import tempfile
 import shutil
+import sys
 
 class VPypeProcessor:
     @classmethod
@@ -177,4 +178,110 @@ M2 ; End of program
                 return (gcode_content,)
             else:
                 raise Exception("VPype did not generate the GCode file.")
+
+class VPypeRemoveBorder:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "svg_input": ("STRING", {"forceInput": True}),
+                "threshold_percentage": ("FLOAT", {"default": 0.9, "min": 0.0, "max": 1.0, "step": 0.01, "display": "number"}),
+            },
+        }
+
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("svg_output",)
+    FUNCTION = "remove_border"
+    CATEGORY = "VPype"
+
+    def remove_border(self, svg_input, threshold_percentage):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            input_path = os.path.join(temp_dir, "input.svg")
+            output_path = os.path.join(temp_dir, "output.svg")
+            script_path = os.path.join(temp_dir, "remove_border.py")
+
+            if os.path.isfile(svg_input):
+                 shutil.copy(svg_input, input_path)
+            else:
+                with open(input_path, "w", encoding="utf-8") as f:
+                    f.write(svg_input)
+            
+            # Python script to be executed in the environment
+            script_content = """
+import sys
+try:
+    import vpype
+    import numpy as np
+except ImportError:
+    # If vpype is not found as a library, we can't run this script
+    sys.exit(1)
+
+input_file = sys.argv[1]
+output_file = sys.argv[2]
+threshold = float(sys.argv[3])
+
+doc = vpype.read_multilayer_svg(input_file, quantization=1.0)
+bounds = doc.bounds()
+
+if bounds:
+    min_x, min_y, max_x, max_y = bounds
+    doc_width = max_x - min_x
+    doc_height = max_y - min_y
+    doc_area = doc_width * doc_height
+    
+    if doc_area > 0:
+        for layer in doc.layers.values():
+            idxs_to_remove = []
+            for i, line in enumerate(layer):
+                # line is numpy array of complex
+                if len(line) > 0:
+                    # Check if closed
+                    is_closed = abs(line[0] - line[-1]) < 1e-4
+                    if is_closed:
+                        # bounding box of the line
+                        lx_min = line.real.min()
+                        lx_max = line.real.max()
+                        ly_min = line.imag.min()
+                        ly_max = line.imag.max()
+                        
+                        l_area = (lx_max - lx_min) * (ly_max - ly_min)
+                        
+                        if l_area / doc_area >= threshold:
+                            idxs_to_remove.append(i)
+            
+            # Remove indices in reverse order to keep others valid
+            for i in sorted(idxs_to_remove, reverse=True):
+                del layer[i]
+
+vpype.write_svg(output_file, doc)
+"""
+            with open(script_path, "w", encoding="utf-8") as f:
+                f.write(script_content)
+
+            # Build command to run the python script using the current python interpreter
+            cmd = [
+                sys.executable,
+                script_path,
+                input_path,
+                output_path,
+                str(threshold_percentage)
+            ]
+
+            try:
+                result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+                print(f"VPype Remove Border stdout: {result.stdout}")
+            except subprocess.CalledProcessError as e:
+                print(f"VPype Remove Border stderr: {e.stderr}")
+                msg = f"Script execution failed: {e.stderr}"
+                if "ImportError" in e.stderr or e.returncode == 1:
+                     msg += "\nEnsure vpype is installed in the python environment (pip install vpype)."
+                raise Exception(msg)
+
+            if os.path.exists(output_path):
+                with open(output_path, "r", encoding="utf-8") as f:
+                    processed_svg = f.read()
+                return (processed_svg,)
+            else:
+                raise Exception("Script did not generate the output file.")
+
 
