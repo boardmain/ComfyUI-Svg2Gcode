@@ -1,0 +1,18 @@
+[project]
+name = "comfyui-svg2gcode"
+description = "ComfyUI nodes for processing SVG and generating G-code using vpype"
+version = "1.0.0"
+authors = [
+    { name = "Samuele Coppedè" }
+]
+license = { text = "MIT" }
+dependencies = ["vpype", "vpype-occult", "vpype-gcode"]
+
+[project.urls]
+Repository = "https://github.com/boardmain/ComfyUI-Svg2Gcode"
+#  Used by Comfy Registry https://comfyregistry.org
+
+[tool.comfy]
+PublisherId = "samuelecoppede"
+DisplayName = "ComfyUI-Svg2Gcode"
+Icon = ""
