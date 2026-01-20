@@ -253,7 +253,8 @@ if bounds:
             for i in sorted(idxs_to_remove, reverse=True):
                 del layer[i]
 
-vpype.write_svg(output_file, doc)
+with open(output_file, "w", encoding="utf-8") as f:
+    vpype.write_svg(f, doc)
 """
             with open(script_path, "w", encoding="utf-8") as f:
                 f.write(script_content)
