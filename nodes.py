@@ -209,11 +209,12 @@ class VPypeRemoveBorder:
             # Python script to be executed in the environment
             script_content = """
 import sys
+import math
+
 try:
     import vpype
     import numpy as np
 except ImportError:
-    # If vpype is not found as a library, we can't run this script
     sys.exit(1)
 
 input_file = sys.argv[1]
@@ -229,27 +230,44 @@ if bounds:
     doc_height = max_y - min_y
     doc_area = doc_width * doc_height
     
+    print(f"Document Bounds: {bounds}")
+    print(f"Document Area: {doc_area}")
+
     if doc_area > 0:
-        for layer in doc.layers.values():
+        for layer_id, layer in doc.layers.items():
             idxs_to_remove = []
             for i, line in enumerate(layer):
-                # line is numpy array of complex
                 if len(line) > 0:
-                    # Check if closed
-                    is_closed = abs(line[0] - line[-1]) < 1e-4
-                    if is_closed:
-                        # bounding box of the line
-                        lx_min = line.real.min()
-                        lx_max = line.real.max()
-                        ly_min = line.imag.min()
-                        ly_max = line.imag.max()
-                        
-                        l_area = (lx_max - lx_min) * (ly_max - ly_min)
-                        
-                        if l_area / doc_area >= threshold:
-                            idxs_to_remove.append(i)
+                    # Check if closed (first and last point are close)
+                    dist = abs(line[0] - line[-1])
+                    is_closed = dist < 1e-1  # Relaxed tolerance for closure
+                    
+                    # bounding box of the line
+                    lx_min = line.real.min()
+                    lx_max = line.real.max()
+                    ly_min = line.imag.min()
+                    ly_max = line.imag.max()
+                    
+                    l_width = lx_max - lx_min
+                    l_height = ly_max - ly_min
+                    l_area = l_width * l_height
+                    
+                    # Check overlap with document bounds
+                    # If the line bounds are very close to doc bounds, it's a border candidate
+                    # Tolerance: 1% of dimension max
+                    tol_current = max(doc_width, doc_height) * (1.0 - threshold) 
+                    
+                    match_x = abs(lx_min - min_x) < tol_current and abs(lx_max - max_x) < tol_current
+                    match_y = abs(ly_min - min_y) < tol_current and abs(ly_max - max_y) < tol_current
+                    
+                    is_border_by_bounds = match_x and match_y
+                    
+                    print(f"Layer {layer_id} Line {i}: Closed={is_closed}, AreaRatio={l_area/doc_area:.4f}, BoundsMatch={is_border_by_bounds}")
+
+                    if is_closed and is_border_by_bounds:
+                        print(f"Removing Line {i} as Border")
+                        idxs_to_remove.append(i)
             
-            # Remove indices in reverse order to keep others valid
             for i in sorted(idxs_to_remove, reverse=True):
                 del layer[i]
 
