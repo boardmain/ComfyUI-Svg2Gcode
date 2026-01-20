@@ -14,6 +14,8 @@ _Note: The example workflow above uses [z-image](https://github.com/Z-Image/Comf
   - `linemerge`: Merges nearby lines to optimize plotting paths.
   - `linesimplify`: Simplifies paths by reducing the number of nodes.
   - `linesort`: Sorts lines to minimize travel distance.
+  - `min_length`: Filters out paths shorter than a specified threshold.
+  - `multipass`: Duplicate geometries for multiple passes.
   - `rotate`: Rotates the geometry.
   - `layout`: Scales and centers the design on a specified page size (A4, etc.) within margins.
 - **VPype G-Code Generator**:
@@ -32,10 +34,10 @@ This node performs geometric operations on an input SVG file.
 
 - **`svg_input`** (STRING): The SVG content or file path. Usually comes from a previous node.
 - **`merge_tolerance`** (FLOAT, default: 0.1): Tolerance for merging lines (mm).
-- **`simplify_tolerance`** (FLOAT, default: 0.05): Tolerance for path simplification (mm).\* **`min_length`** (FLOAT, default: 0.0): Filter out paths shorter than this length (mm). Set to 0 to disable.
-
-* **`multipass_count`** (INT, default: 0): Duplicate geometries to draw them multiple times. Set to 0 to disable.- **`rotation`** (FLOAT, default: 90.0): Angle to rotate the design (degrees).
-
+- **`simplify_tolerance`** (FLOAT, default: 0.05): Tolerance for path simplification (mm).
+- **`min_length`** (FLOAT, default: 0.0): Filter out paths shorter than this length (mm). Set to 0 to disable.
+- **`multipass_count`** (INT, default: 0): Duplicate geometries to draw them multiple times. Set to 0 to disable.
+- **`rotation`** (FLOAT, default: 90.0): Angle to rotate the design (degrees).
 - **`perform_layout`** (BOOLEAN, default: True): If enabled, scales and aligns the SVG to the specified page dimensions. Disable if you want to keep the original SVG coordinates/size.
 - **`margin`** (FLOAT, default: 10.0): Page margin when layout is enabled (mm).
 - **`width`** (FLOAT, default: 210.0): Target page width (mm). Default is A4 width.
