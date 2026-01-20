@@ -1,5 +1,7 @@
 # ComfyUI VPype Nodes
 
+<a href="https://www.buymeacoffee.com/gcode.pro" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+
 This custom node suite for ComfyUI uses `vpype` to process SVG files and generate G-code for plotting. It provides two main nodes: one for processing SVGs (merging, simplifying, rotating, layout) and another for generating G-code with customizable plotting parameters.
 
 ## Features

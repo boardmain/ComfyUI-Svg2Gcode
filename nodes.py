@@ -234,9 +234,11 @@ if bounds:
     print(f"Document Area: {doc_area}")
 
     if doc_area > 0:
-        for layer_id, layer in doc.layers.items():
-            idxs_to_remove = []
+        for layer_id in list(doc.layers.keys()):
+            layer = doc.layers[layer_id]
+            lines_to_keep = []
             for i, line in enumerate(layer):
+                should_remove = False
                 if len(line) > 0:
                     # Check if closed (first and last point are close)
                     dist = abs(line[0] - line[-1])
@@ -265,11 +267,13 @@ if bounds:
                     print(f"Layer {layer_id} Line {i}: Closed={is_closed}, AreaRatio={l_area/doc_area:.4f}, BoundsMatch={is_border_by_bounds}")
 
                     if is_closed and is_border_by_bounds:
+                        should_remove = True
                         print(f"Removing Line {i} as Border")
-                        idxs_to_remove.append(i)
+                
+                if not should_remove:
+                    lines_to_keep.append(line)
             
-            for i in sorted(idxs_to_remove, reverse=True):
-                del layer[i]
+            doc.layers[layer_id] = vpype.LineCollection(lines_to_keep)
 
 with open(output_file, "w", encoding="utf-8") as f:
     vpype.write_svg(f, doc)
