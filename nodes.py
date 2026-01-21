@@ -46,6 +46,7 @@ class VPypeProcessor:
             cmd = [
                 "vpype",
                 "read", input_path,
+                "--attr", "stroke",
                 "linemerge", "--tolerance", f"{merge_tolerance}mm",
                 "linesimplify", "--tolerance", f"{simplify_tolerance}mm",
             ]
