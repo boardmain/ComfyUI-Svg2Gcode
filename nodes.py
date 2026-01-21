@@ -45,8 +45,7 @@ class VPypeProcessor:
             # Note: vpype needs to be installed in the environment where ComfyUI is running
             cmd = [
                 "vpype",
-                "read", input_path,
-                "--attr", "stroke",
+                "read --attr stroke", input_path,
                 "linemerge", "--tolerance", f"{merge_tolerance}mm",
                 "linesimplify", "--tolerance", f"{simplify_tolerance}mm",
             ]
