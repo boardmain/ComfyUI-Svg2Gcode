@@ -38,7 +38,7 @@ class VPypeExtendedProcessor:
                 "linesort_two_opt": ("BOOLEAN", {"default": False}),
                 
                 # Multipass
-                "multipass_count": ("INT", {"default": 1, "min": 1, "max": 50, "step": 1, "display": "number"}),
+                "multipass_count": ("INT", {"default": 0, "min": 0, "max": 50, "step": 1, "display": "number"}),
                 
                 # Transforms
                 "rotate_angle": ("FLOAT", {"default": 0.0, "min": -360.0, "max": 360.0, "step": 1.0, "display": "number"}),
