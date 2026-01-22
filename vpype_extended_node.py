@@ -26,6 +26,12 @@ class VPypeExtendedProcessor:
                 "squiggles_period": ("FLOAT", {"default": 3.0, "min": 0.1, "max": 100.0, "step": 0.1}),
                 
                 "filter_min_length": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 100.0, "step": 0.1, "display": "number"}),
+
+                # Occult (Plugin)
+                "occult_enable": ("BOOLEAN", {"default": False}),
+                "occult_ignore_layers": ("BOOLEAN", {"default": False}),
+                "occult_cross_layers": ("BOOLEAN", {"default": False}),
+                "occult_keep_occulted": ("BOOLEAN", {"default": False}),
                 
                 # Optimization
                 "linesort_enable": ("BOOLEAN", {"default": True}),
@@ -63,6 +69,7 @@ class VPypeExtendedProcessor:
                     reloop_enable, reloop_tolerance,
                     squiggles_enable, squiggles_amplitude, squiggles_period,
                     filter_min_length,
+                    occult_enable, occult_ignore_layers, occult_cross_layers, occult_keep_occulted,
                     linesort_enable, linesort_two_opt,
                     multipass_count,
                     rotate_angle, skew_x, skew_y, scale_x, scale_y,
@@ -96,6 +103,16 @@ class VPypeExtendedProcessor:
 
             if filter_min_length > 0:
                 cmd.extend(["filter", "--min-length", f"{filter_min_length}mm"])
+
+            if occult_enable:
+                occult_cmd = ["occult"]
+                if occult_ignore_layers:
+                    occult_cmd.append("-i")
+                if occult_cross_layers:
+                    occult_cmd.append("-a")
+                if occult_keep_occulted:
+                    occult_cmd.append("-k")
+                cmd.extend(occult_cmd)
 
             if linesort_enable:
                 sort_cmd = ["linesort"]
